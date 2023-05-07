@@ -100,6 +100,23 @@ const updateMovie = (req, res) => {
     });
 };
 
+const deleteMovie = (req, res) => {
+  const id = parseInt(req.params.id);
+
+  database
+    .query("delete from movies where id = ?", [id])
+    .then(([result]) => {
+      if (result.affectedRows === 0) {
+        res.status(404).send("Not Found");
+      } else {
+        res.sendStatus(204);
+      }
+    })
+    .catch((err) => {
+      console.error(err);
+      res.status(500).send("Error deleting the movie");
+    });
+};
 
 
 module.exports = {
@@ -107,4 +124,5 @@ module.exports = {
   getMovieById,
   postMovie,
   updateMovie,
+  deleteMovie,
 };
