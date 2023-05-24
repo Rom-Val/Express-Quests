@@ -1,6 +1,7 @@
 require("dotenv").config();
-
 const express = require("express");
+const { validateMovie, validateUser } = require("./middlewares");
+
 
 
 const app = express();
@@ -20,9 +21,9 @@ const movieHandlers = require("./movieHandlers");
 app.get("/api/movies", movieHandlers.getMovies);
 app.get("/api/movies/:id", movieHandlers.getMovieById);
 
-app.post("/api/movies", movieHandlers.postMovie);
+app.post("/api/movies", validateMovie, movieHandlers.postMovie);
 
-app.put("/api/movies/:id", movieHandlers.updateMovie);
+app.put("/api/movies/:id", validateMovie, movieHandlers.updateMovie);
 
 app.delete("/api/movies/:id", movieHandlers.deleteMovie);
 
@@ -33,10 +34,10 @@ app.get("/api/users", userHandlers.getUsers);
 app.get("/api/users/:id", userHandlers.getUserById);
 
 //route pour l'ajout des users
-app.post("/api/users", userHandlers.postUser);
+app.post("/api/users", validateUser, userHandlers.postUser);
 
 //route pour modifier un user
-app.put("/api/users/:id", userHandlers.updateUser);
+app.put("/api/users/:id", validateUser, userHandlers.updateUser);
 
 //route pour delete un user
 app.delete("/api/users/:id", userHandlers.deleteUser);
