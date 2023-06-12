@@ -1,6 +1,6 @@
 require("dotenv").config();
 const express = require("express");
-const { validateMovie, validateUser } = require("./middlewares");
+const { validateMovie, validateUser, hidePassword } = require("./middlewares");
 
 
 
@@ -30,17 +30,23 @@ app.delete("/api/movies/:id", movieHandlers.deleteMovie);
 
 const userHandlers = require("./userHandlers");
 
-app.get("/api/users", userHandlers.getUsers);
-app.get("/api/users/:id", userHandlers.getUserById);
-
-//route pour l'ajout des users
-app.post("/api/users", validateUser, userHandlers.postUser);
+app.get("/api/users", userHandlers.getUsers, hidePassword);
+app.get("/api/users/:id", userHandlers.getUserById, hidePassword);
 
 //route pour modifier un user
 app.put("/api/users/:id", validateUser, userHandlers.updateUser);
 
 //route pour delete un user
 app.delete("/api/users/:id", userHandlers.deleteUser);
+
+
+// Password
+
+const { hashPassword } = require("./auth.js");
+
+app.post("/api/users", validateUser, hashPassword, userHandlers.postUser);
+app.put("/api/users/:id", hashPassword, userHandlers.updateUser);
+
 
 
 app.listen(port, (err) => {

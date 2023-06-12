@@ -18,4 +18,19 @@ const validateUser = (req, res, next) => {
     next();
 };
 
-module.exports = { validateMovie, validateUser };
+
+const hidePassword = (req, res, next) => {
+    if (Array.isArray(res.users)) {
+        res.users.forEach((user) => {
+            delete user.hashedPassword;
+        });
+    } else {
+        delete res.users.hashedPassword;
+    }
+    res.json(res.users)
+};
+
+module.exports = {
+    validateMovie, validateUser,
+    hidePassword,
+};

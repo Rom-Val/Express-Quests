@@ -1,18 +1,18 @@
 const database = require("./database");
 
 
-const getUsers = (req, res) => {
+const getUsers = (req, res, next) => {
     const initialSql = "select * from users";
     const where = [];
 
-    if (req.query.language = English) {
+    if (req.query.language = 'English') {
         where.push({
             column: "language",
             value: req.query.language,
             operator: "=",
         });
     }
-    if (req.query.city = Paris) {
+    if (req.query.city = 'Paris') {
         where.push({
             column: "city",
             value: req.query.city,
@@ -30,7 +30,8 @@ const getUsers = (req, res) => {
             where.map(({ value }) => value)
         )
         .then(([users]) => {
-            res.json(users);
+            res.users = users;
+            next();
         })
         .catch((err) => {
             console.error(err);
@@ -40,15 +41,16 @@ const getUsers = (req, res) => {
 
 
 
-const getUserById = (req, res) => {
+const getUserById = (req, res, next) => {
     const id = parseInt(req.params.id);
 
     database
         .query("select * from users where id = ?", [id])
         .then(([users]) => {
-            users.length === 0
-                ? res.status(404).send("Not found")
-                : res.json(users[0]);
+            if (users.length === 0)
+                return res.status(404).send("not found")
+            res.users = users[0];
+            next();
         })
         .catch((err) => {
             console.error(err);
@@ -58,11 +60,11 @@ const getUserById = (req, res) => {
 
 //fonction pour l'ajout de Users
 const postUser = (req, res) => {
-    const { firstname, lastname, email, city, language } = req.body;
+    const { firstname, lastname, email, city, language, hashedPassword } = req.body;
     database
         .query(
-            "INSERT INTO users(firstname, lastname, email, city, language) VALUES (?, ?, ?, ?, ?)",
-            [firstname, lastname, email, city, language]
+            "INSERT INTO users(firstname, lastname, email, city, language, hashedPassword) VALUES (?, ?, ?, ?, ?, ?)",
+            [firstname, lastname, email, city, language, hashedPassword]
         )
         .then(([result]) => {
             res.location(`/api/users/${result.insertId}`).sendStatus(201);
